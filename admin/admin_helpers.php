@@ -57,6 +57,44 @@ function admin_upload_image(string $field, string $folder): ?string
     return $filename;
 }
 
+function admin_upload_video(string $field): ?string
+{
+    if (!isset($_FILES[$field]) || $_FILES[$field]['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    $upload = $_FILES[$field];
+    if ($upload['error'] !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Tải video lên thất bại. Vui lòng thử lại.');
+    }
+    if (!is_uploaded_file($upload['tmp_name']) || $upload['size'] > 50 * 1024 * 1024) {
+        throw new RuntimeException('Video không hợp lệ hoặc lớn hơn 50 MB.');
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($upload['tmp_name']);
+    $extensions = [
+        'video/mp4' => 'mp4',
+        'video/webm' => 'webm',
+        'video/ogg' => 'ogv',
+    ];
+    if (!isset($extensions[$mime])) {
+        throw new RuntimeException('Chỉ chấp nhận video MP4, WEBM hoặc OGV.');
+    }
+
+    $directory = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'videos';
+    if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
+        throw new RuntimeException('Không thể tạo thư mục lưu video.');
+    }
+
+    $filename = bin2hex(random_bytes(16)) . '.' . $extensions[$mime];
+    if (!move_uploaded_file($upload['tmp_name'], $directory . DIRECTORY_SEPARATOR . $filename)) {
+        throw new RuntimeException('Không thể lưu video đã tải lên.');
+    }
+
+    return 'uploads/videos/' . $filename;
+}
+
 function admin_page_start(string $title): void
 {
     $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
@@ -71,7 +109,7 @@ function admin_page_start(string $title): void
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             body { min-height: 100vh; background: #f8f5ee; }
-            .admin-header { background: linear-gradient(135deg, #C8961E 0%, #a07010 100%); }
+            .admin-header { background: #C8961E; }
             .admin-main { max-width: 1320px; }
             .table img { width: 72px; height: 54px; object-fit: cover; border-radius: 6px; }
         </style>
@@ -91,7 +129,7 @@ function admin_page_start(string $title): void
                             <i class="fas fa-user-shield me-1"></i>Admin
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="change_password.php"><i class="fas fa-key me-2 text-warning"></i>Đổi mật khẩu</a></li>
+                            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-id-card me-2 text-warning"></i>Thông tin tài khoản</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="post" action="logout.php" class="m-0">

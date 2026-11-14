@@ -28,6 +28,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($visit_date < date('Y-m-d')) {
             $error = 'Ngày tham quan không được là ngày trong quá khứ.';
         } else {
+            $registrationSaved = false;
+            $saveRegistration = $conn->prepare(
+                'INSERT INTO visit_registrations
+                    (full_name, email, phone, visit_date, visit_time, group_size, organization, notes)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+            );
+            if (!$saveRegistration) {
+                error_log('Could not prepare visit registration: ' . $conn->error);
+                $error = 'Không thể lưu đăng ký lúc này. Vui lòng thử lại sau.';
+            } else {
+                $saveRegistration->bind_param(
+                    'sssssiss',
+                    $full_name,
+                    $email,
+                    $phone,
+                    $visit_date,
+                    $visit_time,
+                    $group_size,
+                    $organization,
+                    $notes
+                );
+                if ($saveRegistration->execute()) {
+                    $registrationSaved = true;
+                } else {
+                    error_log('Could not save visit registration: ' . $saveRegistration->error);
+                    $error = 'Không thể lưu đăng ký lúc này. Vui lòng thử lại sau.';
+                }
+                $saveRegistration->close();
+            }
+
             // ── Hàm gửi email ────────────────────────────────
             function sendMail($to, $toName, $subject, $body) {
                 $mail = new PHPMailer(true);
@@ -123,20 +153,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p style='color:#888;font-size:11px'>Vui lòng xác nhận và liên hệ lại với khách hàng.</p>
             " . $wrap_close;
 
-            try {
-                // Gửi cho người đăng ký
-                sendMail($email, $full_name,
-                    'Xác nhận đăng ký tham quan - Bảo tàng Văn hóa Dân tộc Khmer tỉnh Vĩnh Long',
-                    $body_user);
+            if ($registrationSaved) {
+                try {
+                    // Gửi cho người đăng ký
+                    sendMail($email, $full_name,
+                        'Xác nhận đăng ký tham quan - Bảo tàng Văn hóa Dân tộc Khmer tỉnh Vĩnh Long',
+                        $body_user);
 
-                // Gửi cho bảo tàng
-                sendMail(MAIL_ADMIN, 'Quản trị viên',
-                    "Đăng ký mới từ $full_name - " . date('d/m/Y H:i'),
-                    $body_admin);
+                    // Gửi cho bảo tàng
+                    sendMail(MAIL_ADMIN, 'Quản trị viên',
+                        "Đăng ký mới từ $full_name - " . date('d/m/Y H:i'),
+                        $body_admin);
 
-                $success = "Đăng ký thành công! Email xác nhận đã được gửi đến <strong>$email</strong>.";
-            } catch (Exception $e) {
-                $error = 'Đăng ký thất bại, vui lòng thử lại. Lỗi: ' . $e->getMessage();
+                    $success = "Đăng ký thành công! Email xác nhận đã được gửi đến <strong>$email</strong>.";
+                } catch (Exception $e) {
+                    $error = 'Đăng ký đã được lưu, nhưng không thể gửi email xác nhận. Vui lòng liên hệ bảo tàng.';
+                    error_log('Could not send visit registration email: ' . $e->getMessage());
+                }
             }
         }
     } else {
@@ -210,10 +243,8 @@ include 'includes/header.php';
                                 <label class="form-label fw-semibold">Giờ tham quan <span class="text-danger">*</span></label>
                                 <select name="visit_time" class="form-select" required>
                                     <option value="">-- Chọn giờ --</option>
-                                    <option value="8:00 - 10:00"  <?= (($_POST['visit_time'] ?? '') === '8:00 - 10:00')  ? 'selected' : '' ?>>8:00 - 10:00</option>
-                                    <option value="10:00 - 12:00" <?= (($_POST['visit_time'] ?? '') === '10:00 - 12:00') ? 'selected' : '' ?>>10:00 - 12:00</option>
-                                    <option value="13:00 - 15:00" <?= (($_POST['visit_time'] ?? '') === '13:00 - 15:00') ? 'selected' : '' ?>>13:00 - 15:00</option>
-                                    <option value="15:00 - 17:00" <?= (($_POST['visit_time'] ?? '') === '15:00 - 17:00') ? 'selected' : '' ?>>15:00 - 17:00</option>
+                                    <option value="07:00 - 11:00"  <?= (($_POST['visit_time'] ?? '') === '07:00 - 11:00')  ? 'selected' : '' ?>>07:00 - 11:00</option>
+                                    <option value="13:00 - 17:00" <?= (($_POST['visit_time'] ?? '') === '13:00 - 17:00') ? 'selected' : '' ?>>13:00 - 17:00</option>
                                 </select>
                             </div>
                             <div class="col-12 mb-3">

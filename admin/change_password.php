@@ -3,6 +3,8 @@ require_once '../config/db.php';
 require_once '../includes/auth.php';
 require_once 'admin_helpers.php';
 check_admin_login();
+header('Location: profile.php');
+exit();
 
 $error = '';
 $success = '';
@@ -29,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$admin || !password_verify($currentPassword, $admin['password'])) {
             $error = 'Mật khẩu hiện tại không đúng.';
+        } elseif (password_verify($newPassword, $admin['password'])) {
+            $error = 'Mật khẩu mới phải khác mật khẩu hiện tại.';
         } else {
             $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
             $stmt = $conn->prepare('UPDATE admins SET password = ? WHERE id = ?');

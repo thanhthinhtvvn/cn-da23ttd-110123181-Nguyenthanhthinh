@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /user_login.php
+Disallow: /user_register.php
+Disallow: /user_forgot_password.php
+Disallow: /user_profile.php
+Disallow: /user_logout.php
+Disallow: /search_suggestions.php
+
+Sitemap: https://baotangkhmer.free.je/sitemap.xml

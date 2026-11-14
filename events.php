@@ -5,69 +5,105 @@ require_once 'includes/event_description.php';
 $page_title = 'Sự Kiện - Bảo Tàng Văn Hóa Dân Tộc Khmer';
 include 'includes/header.php';
 
-$events_result = $conn->query("SELECT * FROM events ORDER BY event_date DESC");
-$event_slides_result = $conn->query(
-    "SELECT content, url FROM media WHERE `table` = 'event_slides' ORDER BY id ASC"
-);
-$events = [];
-$event_slides = [];
-while ($event = $events_result->fetch_assoc()) {
-    $events[] = $event;
+$events_result = $conn->query("SELECT * FROM events ORDER BY created_at DESC, id DESC");
+
+// Cập nhật truy vấn lấy banner đồng bộ với bảng media mới (không dùng cột `table` bị lỗi)
+$event_slides_result = false;
+$event_video_result = false;
+$mediaColumns = $conn->query("SHOW COLUMNS FROM `media` LIKE 'table'");
+if ($mediaColumns && $mediaColumns->num_rows > 0) {
+    $event_slides_result = $conn->query("SELECT id, content, url FROM media WHERE `table` = 'event_slides' ORDER BY id ASC");
+    $event_video_result = $conn->query("SELECT id, content, url FROM media WHERE `table` = 'event_video' ORDER BY id ASC LIMIT 1");
 }
 
+$events = [];
+$event_slides = [];
+$event_video = null;
+if ($events_result) {
+    while ($event = $events_result->fetch_assoc()) {
+        $events[] = $event;
+    }
+}
+
+if ($event_slides_result) {
 while ($slide = $event_slides_result->fetch_assoc()) {
-    $slide_image = event_image_src($slide['url'] ?? '');
-    if ($slide_image !== null) {
-        $event_slides[] = [
-            'content' => $slide['content'] ?? '',
-            'image_src' => $slide_image,
-        ];
+    $rawUrl = trim($slide['url']);
+    $filename = basename($rawUrl);
+    
+    // Tự động quét và tìm file thực tế trên hosting (giống y hệt trang chủ)
+    $slide_image = 'images/' . $filename;
+    if ($rawUrl !== '' && filter_var($rawUrl, FILTER_VALIDATE_URL)) {
+        $slide_image = $rawUrl;
+    } else {
+        if (is_file(__DIR__ . '/images/' . $filename)) {
+            $slide_image = 'images/' . $filename;
+        } elseif (is_file(__DIR__ . '/uploads/' . $filename)) {
+            $slide_image = 'uploads/' . $filename;
+        } elseif (is_file(__DIR__ . '/' . ltrim($rawUrl, '/'))) {
+            $slide_image = ltrim($rawUrl, '/');
+        }
+    }
+
+        if (!empty($slide_image)) {
+            $event_slides[] = [
+                'content' => $slide['content'] ?? '',
+                'image_src' => $slide_image,
+            ];
+        }
+    }
+}
+if ($event_video_result && $event_video_result->num_rows > 0) {
+    $videoRow = $event_video_result->fetch_assoc();
+    $rawVideoUrl = trim($videoRow['url']);
+    if (filter_var($rawVideoUrl, FILTER_VALIDATE_URL)) {
+        $videoSrc = $rawVideoUrl;
+    } else {
+        $videoPath = ltrim(str_replace('\\', '/', $rawVideoUrl), '/');
+        $videoSrc = in_array('..', explode('/', $videoPath), true) ? '' : $videoPath;
+    }
+    if ($videoSrc !== '') {
+        $event_video = ['content' => $videoRow['content'] ?? '', 'video_src' => $videoSrc];
     }
 }
 ?>
 
 <style>
-    .events-hero .carousel-bg {
-        height: 220px;
-        background: #171613;
-        overflow: hidden;
+    /* Cố định chiều cao khung slide và hiển thị ảnh nền sắc nét */
+    #eventsCarousel .carousel-item {
+        height: 420px;
+        position: relative;
+        background: #111;
     }
-
-    .events-hero .event-slide-backdrop {
+    #eventsCarousel .carousel-overlay {
         position: absolute;
-        inset: -12px;
-        width: calc(100% + 24px);
-        height: calc(100% + 24px);
-        object-fit: cover;
-        filter: blur(12px) brightness(0.45);
-    }
-
-    .events-hero .event-slide-image {
-        position: absolute;
-        inset: 0;
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        z-index: 1;
-    }
-
-    .events-hero .carousel-overlay {
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.45);
         z-index: 2;
     }
-
-    .events-hero .carousel-caption-custom {
-        z-index: 3;
+    .carousel-caption-custom {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        width: 90%;
+        z-index: 5;
     }
-
-    .events-hero .carousel-caption-custom h1 {
-        color: #fff;
+    #eventsCarousel .carousel-banner-image {
+        object-fit: cover;
+        object-position: center center;
     }
-
-    @media (max-width: 576px) {
-        .events-hero .carousel-bg {
-            height: 150px;
+    @media (max-width: 991.98px) {
+        #eventsCarousel .carousel-item {
+            height: 320px;
+        }
+    }
+    @media (max-width: 575.98px) {
+        #eventsCarousel .carousel-item {
+            height: 230px;
+        }
+        #eventsCarousel .carousel-caption-custom h1 {
+            font-size: 0.95rem !important;
         }
     }
 
@@ -133,22 +169,36 @@ while ($slide = $event_slides_result->fetch_assoc()) {
         color: #fff;
     }
 
-    @media (max-width: 576px) {
-        .event-detail-modal .modal-header {
-            padding: 0.85rem 1rem;
-        }
+    .event-gallery-banner {
+        overflow: hidden;
+        border-radius: 12px;
+        border: 1px solid rgba(200, 150, 30, 0.38);
+        box-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.14);
+        background: #171613;
+    }
 
-        .event-detail-modal .event-description {
-            padding: 1rem;
-            font-size: 0.95rem;
-        }
+    #eventGalleryCarousel,
+    #eventGalleryCarousel .carousel-item {
+        height: 300px;
+    }
+
+    #eventGalleryCarousel .gallery-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        display: block;
+    }
+
+    @media (max-width: 767.98px) {
+        #eventGalleryCarousel,
+        #eventGalleryCarousel .carousel-item { height: 210px; }
+        #eventGalleryCarousel .gallery-image { height: 210px; }
     }
 </style>
 
-<!-- Banner sự kiện: ảnh lấy từ bảng media, độc lập với ảnh từng sự kiện -->
+<!-- Banner sự kiện chuẩn đồng bộ với index -->
 <?php if (!empty($event_slides)): ?>
-<div id="eventsCarousel" class="carousel slide carousel-fade events-hero"
-     data-bs-ride="carousel" data-bs-interval="4000">
+<div id="eventsCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
     <?php if (count($event_slides) > 1): ?>
     <div class="carousel-indicators">
         <?php foreach ($event_slides as $i => $slide): ?>
@@ -161,16 +211,15 @@ while ($slide = $event_slides_result->fetch_assoc()) {
     <div class="carousel-inner">
         <?php foreach ($event_slides as $i => $slide): ?>
         <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
-            <div class="carousel-bg">
-                <img class="event-slide-backdrop"
-                     src="<?= htmlspecialchars($slide['image_src'], ENT_QUOTES, 'UTF-8') ?>"
-                     alt="" aria-hidden="true">
-                <img class="event-slide-image"
-                     src="<?= htmlspecialchars($slide['image_src'], ENT_QUOTES, 'UTF-8') ?>" alt="">
-                <div class="carousel-overlay"></div>
-                <div class="carousel-caption-custom carousel-caption-center">
-                    <h1 class="fw-bold">Sự Kiện &amp; Lễ Hội</h1>
-                </div>
+            <img src="<?= htmlspecialchars($slide['image_src'], ENT_QUOTES, 'UTF-8') ?>" class="carousel-banner-image d-block w-100 h-100" alt="Banner sự kiện">
+            <div class="carousel-overlay"></div>
+            <div class="carousel-caption-custom">
+                <h1 class="fw-bold text-white mb-2 shadow-sm" style="font-size: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+    			<?= htmlspecialchars($slide['content'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+				</h1>
+                <?php if ($i === 0): ?>
+                
+                <?php endif; ?>
             </div>
         </div>
         <?php endforeach; ?>
@@ -187,11 +236,10 @@ while ($slide = $event_slides_result->fetch_assoc()) {
     <?php endif; ?>
 </div>
 <?php else: ?>
-<div class="events-hero-fallback text-center text-white p-4 rounded"
-     style="background:linear-gradient(135deg,#C8961E,#a07010);">
-    <i class="fas fa-calendar-alt fa-2x mb-3"></i>
-    <h2 class="h4 fw-bold">Sự Kiện &amp; Lễ Hội</h2>
-    <p class="mb-0 small">Các sự kiện văn hóa đặc sắc tại Bảo tàng Văn hóa Dân tộc Khmer</p>
+<div class="text-center text-white p-5" style="background:linear-gradient(135deg,#C8961E,#a07010);">
+    <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+    <h2 class="h3 fw-bold">Sự Kiện &amp; Lễ Hội</h2>
+    <p class="mb-0">Các sự kiện văn hóa đặc sắc tại Bảo tàng Văn hóa Dân tộc Khmer</p>
 </div>
 <?php endif; ?>
 
@@ -245,7 +293,7 @@ while ($slide = $event_slides_result->fetch_assoc()) {
                 <div class="modal-content border-0">
                     <div class="modal-header text-white flex-wrap gap-2" style="background:#C8961E;">
                         <h5 class="modal-title fw-bold">
-                            <i class="fas fa-calendar-alt me-2"></i><?= htmlspecialchars($e['title']) ?>
+                            <?= htmlspecialchars($e['title']) ?>
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
@@ -271,5 +319,39 @@ while ($slide = $event_slides_result->fetch_assoc()) {
     </div>
     <?php endif; ?>
 </div>
+
+<?php if ($event_video !== null): ?>
+<section class="container pb-5" aria-label="Video nổi bật của sự kiện">
+    <div class="mb-3 text-center">
+        <h3 class="h4 fw-bold text-warning mb-1">Video sự kiện nổi bật</h3>
+        <div class="mx-auto" style="width: 70px; height: 3px; background: #C8961E;"></div>
+    </div>
+    <div class="event-gallery-banner">
+        <video class="d-block w-100" style="max-height: 420px; object-fit: contain; background: #000;" controls autoplay muted loop playsinline>
+            <source src="<?= htmlspecialchars($event_video['video_src'], ENT_QUOTES, 'UTF-8') ?>">
+            Trình duyệt của bạn không hỗ trợ phát video.
+        </video>
+    </div>
+</section>
+<?php elseif (!empty($event_slides)): ?>
+<section class="container pb-5" aria-label="Hình ảnh nổi bật của sự kiện">
+    <div class="mb-3 text-center">
+        <h3 class="h4 fw-bold text-warning mb-1">Hình ảnh sự kiện nổi bật</h3>
+        <div class="mx-auto" style="width: 70px; height: 3px; background: #C8961E;"></div>
+    </div>
+    <div class="event-gallery-banner">
+        <div id="eventGalleryCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3500">
+            <div class="carousel-inner">
+                <?php foreach ($event_slides as $i => $slide): ?>
+                <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
+                    <img src="<?= htmlspecialchars($slide['image_src'], ENT_QUOTES, 'UTF-8') ?>" class="gallery-image"
+                         alt="<?= htmlspecialchars($slide['content'] ?: 'Hình ảnh sự kiện', ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>

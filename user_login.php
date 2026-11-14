@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result  = query("SELECT * FROM users WHERE email = '$escaped' LIMIT 1");
         $user    = $result->fetch_assoc();
 
-        if ($user && $user['status'] === 'Bị khóa') {
+        if ($user && isset($user['status']) && $user['status'] === 'Bị khóa') {
             $error = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ ban quản lý.';
         } elseif ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id']   = $user['id'];
@@ -64,7 +64,7 @@ include 'includes/header.php';
                                        required autofocus>
                             </div>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-2">
                             <label class="form-label fw-semibold">Mật khẩu <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
@@ -74,6 +74,11 @@ include 'includes/header.php';
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                        </div>
+                        <div class="text-end mb-3">
+                            <a href="user_forgot_password.php" class="text-primary-custom small text-decoration-none fw-semibold">
+                                <i class="fas fa-key me-1"></i>Quên mật khẩu?
+                            </a>
                         </div>
                         <button type="submit" class="btn btn-primary-custom w-100 py-2">
                             <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập

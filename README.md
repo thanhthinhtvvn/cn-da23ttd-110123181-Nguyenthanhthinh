@@ -46,7 +46,7 @@ PHƯƠNG PHÁP NGHIÊN CỨU
 ## Cài đặt
 
 1. Đặt thư mục dự án trong document root của máy chủ PHP.
-2. Tạo cơ sở dữ liệu `museum_khmer` và import `database.sql`.
+2. Tạo cơ sở dữ liệu `museum_khmer` và import `database_official.sql`.
 3. Cấu hình kết nối MySQL trong `config/db.php`.
 4. Đặt các biến môi trường sau trên máy chủ để gửi email đăng ký:
    - `MUSEUM_MAIL_USERNAME`: địa chỉ Gmail dùng để gửi email.

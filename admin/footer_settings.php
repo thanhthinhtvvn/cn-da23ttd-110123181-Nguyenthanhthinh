@@ -19,6 +19,7 @@ $defaults = [
     'opening_days' => 'Thứ hai - Chủ nhật',
     'opening_hours' => "07:00 - 11:00\n13:00 - 17:00",
     'address' => 'Nguyễn Du, khóm 3, phường Nguyệt Hóa, tỉnh Vĩnh Long',
+    'map_url' => 'https://www.google.com/maps?q=B%E1%BA%A3o%20t%C3%A0ng%20V%C4%83n%20h%C3%B3a%20D%C3%A2n%20t%E1%BB%99c%20Khmer%20t%E1%BB%89nh%20V%C4%A9nh%20Long&output=embed',
     'phone' => '0294.3842.188',
     'email' => 'baotangvhdtkhmer@gmail.com',
     'website' => 'www.baotang-khmer.vn',
@@ -61,6 +62,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                 }
             }
+        }
+    }
+
+    if ($message === '' && $submitted['map_url'] !== '') {
+        $mapScheme = strtolower((string) parse_url($submitted['map_url'], PHP_URL_SCHEME));
+        $mapHost = strtolower((string) parse_url($submitted['map_url'], PHP_URL_HOST));
+        if (!filter_var($submitted['map_url'], FILTER_VALIDATE_URL)
+            || !in_array($mapScheme, ['http', 'https'], true)
+            || !in_array($mapHost, ['www.google.com', 'maps.google.com', 'google.com'], true)) {
+            $message = 'Liên kết Google Maps nhúng không hợp lệ.';
+            $messageType = 'danger';
         }
     }
 
@@ -135,6 +147,11 @@ admin_page_start('Chỉnh sửa footer');
                     <label class="form-label" for="address">Địa chỉ</label>
                     <input class="form-control" id="address" name="address" value="<?= htmlspecialchars($settings['address'], ENT_QUOTES, 'UTF-8') ?>">
                 </div>
+                <div class="col-12">
+                    <label class="form-label" for="map_url">Liên kết Google Maps nhúng</label>
+                    <textarea class="form-control" id="map_url" name="map_url" rows="2" placeholder="https://www.google.com/maps?q=...&amp;output=embed"><?= htmlspecialchars($settings['map_url'], ENT_QUOTES, 'UTF-8') ?></textarea>
+                    <div class="form-text">Trong Google Maps chọn Chia sẻ → Nhúng bản đồ, sau đó sao chép URL trong thuộc tính <code>src</code>.</div>
+                </div>
                 <div class="col-md-4">
                     <label class="form-label" for="phone">Số điện thoại</label>
                     <input class="form-control" id="phone" name="phone" value="<?= htmlspecialchars($settings['phone'], ENT_QUOTES, 'UTF-8') ?>">
@@ -146,10 +163,6 @@ admin_page_start('Chỉnh sửa footer');
                 <div class="col-md-4">
                     <label class="form-label" for="website">Website</label>
                     <input class="form-control" id="website" name="website" value="<?= htmlspecialchars($settings['website'], ENT_QUOTES, 'UTF-8') ?>">
-                </div>
-                <div class="col-12">
-                    <label class="form-label" for="copyright">Dòng bản quyền</label>
-                    <input class="form-control" id="copyright" name="copyright" value="<?= htmlspecialchars($settings['copyright'], ENT_QUOTES, 'UTF-8') ?>">
                 </div>
             </div>
         </div>

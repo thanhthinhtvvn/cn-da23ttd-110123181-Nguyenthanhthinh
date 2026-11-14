@@ -213,12 +213,22 @@
                     </li>
 
                     <!-- Tài khoản -->                    <?php if (isset($_SESSION['user_id'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="user_profile.php">
+                            <i class="fas fa-id-card me-1"></i>Thông tin chi tiết
+                        </a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#"
                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-user-circle me-1"></i><?php echo htmlspecialchars($_SESSION['user_name']); ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="user_profile.php">
+                                    <i class="fas fa-id-card me-2" style="color:var(--gold)"></i>Thông tin chi tiết
+                                </a>
+                            </li>
                             <li>
                                 <a class="dropdown-item" href="user_logout.php">
                                     <i class="fas fa-sign-out-alt me-2" style="color:var(--gold)"></i>Đăng xuất
@@ -247,11 +257,6 @@
                     </li>
                     <?php endif; ?>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin/login.php">
-                            <i class="fas fa-user-shield me-1"></i>Admin
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>
