@@ -1,0 +1,7 @@
+<?php
+define('MAIL_USERNAME', 'your-sender@gmail.com');
+define('MAIL_PASSWORD', 'your-gmail-app-password');
+define('MAIL_ADMIN', 'nguyenthanhthinh078@gmail.com');
+define('MAIL_FROM_NAME', 'Bảo tàng Văn hóa Dân tộc Khmer');
+define('MAIL_HOST', 'smtp.gmail.com');
+define('MAIL_PORT', 587);

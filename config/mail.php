@@ -1,4 +1,10 @@
 <?php
+$localConfig = __DIR__ . '/mail.local.php';
+if (is_file($localConfig)) {
+    require_once $localConfig;
+    return;
+}
+
 $mailUsername = getenv('MUSEUM_MAIL_USERNAME');
 $mailPassword = getenv('MUSEUM_MAIL_PASSWORD');
 $mailAdmin = getenv('MUSEUM_MAIL_ADMIN');

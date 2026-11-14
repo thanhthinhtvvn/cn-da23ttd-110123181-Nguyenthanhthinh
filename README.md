@@ -61,8 +61,17 @@ PHƯƠNG PHÁP NGHIÊN CỨU
 
 ### Cấu hình email (không bắt buộc để mở website)
 
-Để gửi email đăng ký, đặt các biến môi trường sau trong cấu hình Apache
-(ví dụ `C:\xampp\apache\conf\httpd.conf` hoặc VirtualHost đang dùng), rồi khởi động lại Apache:
+Nếu muốn nhập cấu hình trực tiếp trong một tệp PHP trên máy cá nhân:
+
+1. Sao chép `config/mail.local.php.example` thành `config/mail.local.php`.
+2. Sửa Gmail gửi, mật khẩu ứng dụng và email nhận trong `config/mail.local.php`.
+
+Tệp `config/mail.local.php` được Git bỏ qua, vì vậy mật khẩu không bị đưa lên
+GitHub. Không thêm tệp này vào Git.
+
+Nếu không dùng tệp cục bộ, có thể đặt các biến môi trường sau trong cấu hình
+Apache (ví dụ `C:\xampp\apache\conf\httpd.conf` hoặc VirtualHost đang dùng),
+rồi khởi động lại Apache:
 
 - `MUSEUM_MAIL_USERNAME`: địa chỉ Gmail dùng để gửi email.
 - `MUSEUM_MAIL_PASSWORD`: mật khẩu ứng dụng Gmail.
