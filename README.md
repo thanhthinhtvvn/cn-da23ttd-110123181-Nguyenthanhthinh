@@ -45,12 +45,36 @@ PHƯƠNG PHÁP NGHIÊN CỨU
 
 ## Cài đặt
 
-1. Đặt thư mục dự án trong document root của máy chủ PHP.
-2. Tạo cơ sở dữ liệu `museum_khmer` và import `database_official.sql`.
-3. Cấu hình kết nối MySQL trong `config/db.php`.
-4. Đặt các biến môi trường sau trên máy chủ để gửi email đăng ký:
-   - `MUSEUM_MAIL_USERNAME`: địa chỉ Gmail dùng để gửi email.
-   - `MUSEUM_MAIL_PASSWORD`: mật khẩu ứng dụng Gmail.
-   - `MUSEUM_MAIL_ADMIN`: địa chỉ nhận thông báo đăng ký.
+### Mở lại trên XAMPP
 
-Không lưu mật khẩu email trong mã nguồn. Nếu thiếu cấu hình SMTP, chức năng gửi email sẽ báo lỗi khi có đăng ký mới.
+1. Đặt hoặc clone thư mục dự án vào `C:\xampp\htdocs\DACN\museum_khmer`.
+2. Mở XAMPP Control Panel và khởi động **Apache** cùng **MySQL**.
+3. Nếu chưa có cơ sở dữ liệu, mở `http://localhost/phpmyadmin`, tạo database
+   `museum_khmer`, chọn database đó, vào **Import** và chọn tệp
+   `database_official.sql` trong thư mục dự án. Không import lại nếu database
+   đang có dữ liệu cần giữ.
+4. Nếu thông tin MySQL trên máy khác mặc định XAMPP, sửa các hằng số
+   `DB_HOST`, `DB_USER`, `DB_PASS` và `DB_NAME` trong `config/db.php`.
+   Mặc định là `127.0.0.1`, `root`, mật khẩu trống và `museum_khmer`.
+5. Mở `http://localhost/DACN/museum_khmer/`. Nếu đặt thư mục ở vị trí khác
+   bên trong `htdocs`, thay phần đường dẫn trong URL theo tên thư mục đó.
+
+### Cấu hình email (không bắt buộc để mở website)
+
+Để gửi email đăng ký, đặt các biến môi trường sau trong cấu hình Apache
+(ví dụ `C:\xampp\apache\conf\httpd.conf` hoặc VirtualHost đang dùng), rồi khởi động lại Apache:
+
+- `MUSEUM_MAIL_USERNAME`: địa chỉ Gmail dùng để gửi email.
+- `MUSEUM_MAIL_PASSWORD`: mật khẩu ứng dụng Gmail.
+- `MUSEUM_MAIL_ADMIN`: địa chỉ nhận thông báo đăng ký.
+
+Ví dụ thêm vào cấu hình Apache (thay các giá trị mẫu, không đưa mật khẩu thật lên GitHub):
+
+```apache
+SetEnv MUSEUM_MAIL_USERNAME "your-email@gmail.com"
+SetEnv MUSEUM_MAIL_PASSWORD "your-app-password"
+SetEnv MUSEUM_MAIL_ADMIN "admin-email@example.com"
+```
+
+Không lưu mật khẩu email trong mã nguồn hoặc GitHub. Nếu chưa cấu hình SMTP,
+website vẫn mở được nhưng chức năng gửi email sẽ không hoạt động.
