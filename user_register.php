@@ -62,6 +62,28 @@ $sendVerificationCode = static function (string $email, string $fullName, string
     $mail->send();
 };
 
+$sendRegistrationEmail = static function (
+    string $recipient,
+    string $recipientName,
+    string $subject,
+    string $body
+): void {
+    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+    $mail->isSMTP();
+    $mail->Host = MAIL_HOST;
+    $mail->SMTPAuth = true;
+    $mail->Username = MAIL_USERNAME;
+    $mail->Password = MAIL_PASSWORD;
+    $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port = MAIL_PORT;
+    $mail->CharSet = 'UTF-8';
+    $mail->setFrom(MAIL_USERNAME, MAIL_FROM_NAME);
+    $mail->addAddress($recipient, $recipientName);
+    $mail->Subject = $subject;
+    $mail->Body = $body;
+    $mail->send();
+};
+
 if ($storageReady && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrfToken = $_POST['csrf_token'] ?? '';
     if (!is_string($csrfToken) || !hash_equals($_SESSION['user_register_csrf'], $csrfToken)) {
@@ -330,6 +352,53 @@ if ($storageReady && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     unset($_SESSION['pending_user_registration_email'], $_SESSION['user_register_csrf']);
                     $success = true;
+
+                    $notifications = [
+                        [
+                            'recipient' => $email,
+                            'name' => $pending['full_name'],
+                            'label' => 'người đăng ký',
+                            'subject' => 'Tài khoản Bảo tàng Khmer đã được tạo',
+                            'body' => "Xin chào {$pending['full_name']},\n\n"
+                                . "Tài khoản của bạn đã được xác nhận và tạo thành công.\n"
+                                . "Bạn có thể đăng nhập bằng địa chỉ email này: {$email}\n\n"
+                                . "Trân trọng,\nBan quản lý Bảo tàng Văn hóa Dân tộc Khmer",
+                        ],
+                        [
+                            'recipient' => MAIL_ADMIN,
+                            'name' => 'Bảo tàng Khmer',
+                            'label' => 'bảo tàng',
+                            'subject' => 'Có người dùng mới đăng ký tài khoản',
+                            'body' => "Một người dùng mới đã xác nhận và tạo tài khoản.\n\n"
+                                . "Họ tên: {$pending['full_name']}\n"
+                                . "Email: {$email}\n"
+                                . "Số điện thoại: {$pending['phone']}\n",
+                        ],
+                    ];
+                    $failedNotifications = [];
+                    foreach ($notifications as $notification) {
+                        try {
+                            $sendRegistrationEmail(
+                                $notification['recipient'],
+                                $notification['name'],
+                                $notification['subject'],
+                                $notification['body']
+                            );
+                        } catch (\PHPMailer\PHPMailer\Exception $mailError) {
+                            error_log(
+                                'Could not send account registration email to '
+                                . $notification['label'] . ': ' . $mailError->getMessage()
+                            );
+                            $failedNotifications[] = $notification['label'];
+                        }
+                    }
+
+                    if ($failedNotifications) {
+                        $message = 'Tài khoản đã được tạo, nhưng không gửi được email đến '
+                            . implode(' và ', $failedNotifications) . '.';
+                    } else {
+                        $message = 'Email xác nhận đã được gửi cho bạn và thông báo đã gửi đến bảo tàng.';
+                    }
                 }
             } catch (mysqli_sql_exception $databaseError) {
                 $conn->rollback();
@@ -365,6 +434,9 @@ include 'includes/header.php';
                     <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
                     <h4 class="fw-bold">Đăng ký thành công</h4>
                     <p class="text-muted mb-4">Tài khoản của bạn đã được tạo. Hãy đăng nhập để tiếp tục.</p>
+                    <?php if ($message !== ''): ?>
+                        <p class="text-muted"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></p>
+                    <?php endif; ?>
                     <a href="user_login.php" class="btn btn-primary-custom">
                         <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập ngay
                     </a>

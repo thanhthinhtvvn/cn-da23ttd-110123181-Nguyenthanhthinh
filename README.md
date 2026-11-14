@@ -88,3 +88,7 @@ SetEnv MUSEUM_MAIL_ADMIN "nguyenthanhthinh078@gmail.com"
 
 Không lưu mật khẩu email trong mã nguồn hoặc GitHub. Nếu chưa cấu hình SMTP,
 website vẫn mở được nhưng chức năng gửi email sẽ không hoạt động.
+
+Sau khi người dùng xác nhận mã đăng ký tài khoản, website gửi email xác nhận
+cho người dùng và thông báo tài khoản mới đến Gmail bảo tàng. Đăng ký tham quan
+cũng gửi thông tin cho cả người đăng ký và bảo tàng.
