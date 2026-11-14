@@ -9,15 +9,15 @@ MỤC TIÊU CỦA ĐỀ TÀI
 Mục tiêu tổng quát: Xây dựng website quản lý và quảng bá Bảo tàng Văn hóa Dân tộc Khmer tỉnh Vĩnh Long. Hệ thống hỗ trợ giới thiệu tổng quan về bảo tàng, lịch sử hình thành, văn hóa – đời sống – tín ngưỡng của đồng bào Khmer đồng thời đăng tải tin tức và bài viết cùng với các sự kiện của bảo tàng.
 Mục tiêu cụ thể
 1.	Phân tích và thiết kế hệ thống
-   •	Khảo sát thực trạng quy trình quản lý hiện vật, tổ chức trưng bày và phục vụ khách tham quan tại Bảo tàng Văn hóa Dân tộc Khmer tỉnh Vĩnh Long để xác định         đầy đủ các yêu cầu chức năng và phi chức năng.
-   •	Xây dựng phân tích thiết kế chuẩn hóa (sơ đồ Use Case, Activity) và thiết kế cơ sở dữ liệu quan hệ tối ưu.
-2.	Phân hệ quản trị 
-   •	Xây dựng các module quản lý nghiệp vụ cốt lõi như: Quản lý danh mục hiện vật theo nhóm, chủ đề, niên đại, nguồn gốc, khu vực trưng bày, cung cấp hình ảnh,         mô tả và thông tin chi tiết của từng hiện vật.
-   •	Thống kê lịch đăng ký tham quan theo cá nhân hoặc theo đoàn và quản lý thông tin khách tham quan.
-3. Phân hệ người dùng 
-   •	Xây dựng cổng thông tin điện tử tổng quan về lịch sử, văn hóa, đời sống của đồng bào Khmer.
-   •	Hỗ trợ du khách tra cứu thông tin về hiện vật bằng cách quét mã QR trực tiếp trên camera thiết bị di động để họ hiểu hơn về nguồn gốc của khu trưng bày đó.
-   •	Cung cấp tiện ích đăng ký tham quan bảo tàng trực tuyến.
+   Khảo sát thực trạng quy trình quản lý hiện vật, tổ chức trưng bày và phục vụ khách tham quan tại Bảo tàng Văn hóa Dân tộc Khmer tỉnh Vĩnh Long để xác định         đầy đủ các yêu cầu chức năng và phi chức năng.
+   Xây dựng phân tích thiết kế chuẩn hóa (sơ đồ Use Case, Activity) và thiết kế cơ sở dữ liệu quan hệ tối ưu.
+4.	Phân hệ quản trị
+   Xây dựng các module quản lý nghiệp vụ cốt lõi như: Quản lý danh mục hiện vật theo nhóm, chủ đề, niên đại, nguồn gốc, khu vực trưng bày, cung cấp hình ảnh,         mô tả và thông tin chi tiết của từng hiện vật.
+  	Thống kê lịch đăng ký tham quan theo cá nhân hoặc theo đoàn và quản lý thông tin khách tham quan.
+6. Phân hệ người dùng
+   Xây dựng cổng thông tin điện tử tổng quan về lịch sử, văn hóa, đời sống của đồng bào Khmer.
+   Hỗ trợ du khách tra cứu thông tin về hiện vật bằng cách quét mã QR trực tiếp trên camera thiết bị di động để họ hiểu hơn về nguồn gốc của khu trưng bày đó.
+   Cung cấp tiện ích đăng ký tham quan bảo tàng trực tuyến.
 
 NỘI DUNG NGHIÊN CỨU 
 Nội dung 1: Tìm hiểu quy trình quản lý hiện vật, tổ chức trưng bày và tiếp đón khách tham quan tại bảo tàng nhằm xác định rõ các yêu cầu thực tế của hệ thống.
@@ -31,11 +31,11 @@ Nội dung 7: Kiểm thử các chức năng, kiểm tra khả năng quét mã Q
 ĐỐI TƯỢNG VÀ PHẠM VI NGHIÊN CỨU
 Đối tượng nghiên cứu: Quy trình quản lý danh mục hiện vật, khu vực trưng bày và hoạt động đón tiếp khách tham quan tại Bảo tàng Văn hóa Dân tộc Khmer tỉnh Vĩnh Long, bên cạnh đó là nghiên cứu các giải pháp công nghệ phát triển ứng dụng web và tính năng quét mã QR nhằm hỗ trợ tra cứu thông tin trực tiếp trên camera thiết bị di động của du khách khi đến bảo tàng.
 Phạm vi nghiên cứu
-1.	Về chức năng hệ thống: Giới hạn nghiên cứu các module cốt lõi, bao gồm: 
-   •	Phân hệ quản trị: Quản lý danh mục hiện vật (thêm, sửa, xóa) và sử dụng dịch vụ sinh mã QR. 
-   •	Phân hệ người dùng: Cổng thông tin quảng bá trực tuyến và tính năng hỗ trợ du khách tra cứu thông tin hiện vật nhanh chóng bằng cách quét mã QR qua camera         thiết bị di động.
-2.	Về sản phẩm: Xây dựng hoàn chỉnh một ứng dụng website phục vụ trực tiếp cho Bảo tàng Văn hóa Dân tộc Khmer tỉnh Vĩnh Long.
-3.	Về giới hạn: Đề tài tập trung phục vụ mục đích học tập và khảo sát tính khả thi tại bảo tàng, không bao gồm việc tích hợp thanh toán trực tuyến thương mại phức tạp hay thay thế các hệ thống lưu trữ cấp quốc gia.
+1.	Về chức năng hệ thống: Giới hạn nghiên cứu các module cốt lõi, bao gồm:
+   Phân hệ quản trị: Quản lý danh mục hiện vật (thêm, sửa, xóa) và sử dụng dịch vụ sinh mã QR.
+  	Phân hệ người dùng: Cổng thông tin quảng bá trực tuyến và tính năng hỗ trợ du khách tra cứu thông tin hiện vật nhanh chóng bằng cách quét mã QR qua camera         thiết bị di động.
+3.	Về sản phẩm: Xây dựng hoàn chỉnh một ứng dụng website phục vụ trực tiếp cho Bảo tàng Văn hóa Dân tộc Khmer tỉnh Vĩnh Long.
+4.	Về giới hạn: Đề tài tập trung phục vụ mục đích học tập và khảo sát tính khả thi tại bảo tàng, không bao gồm việc tích hợp thanh toán trực tuyến thương mại phức tạp hay thay thế các hệ thống lưu trữ cấp quốc gia.
 
 PHƯƠNG PHÁP NGHIÊN CỨU
 1.	Phương pháp nghiên cứu lý thuyết: Thu thập, tổng hợp và nghiên cứu các tài liệu, sách báo liên quan đến lịch sử hình thành, văn hóa, tín ngưỡng và phong tục tập quán của đồng bào Khmer Nam Bộ đồng thời khảo sát quy trình thực tế nhằm xác định chính xác các yêu cầu của hệ thống. 
