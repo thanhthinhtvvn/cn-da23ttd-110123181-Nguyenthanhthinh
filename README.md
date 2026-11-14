@@ -66,14 +66,15 @@ PHƯƠNG PHÁP NGHIÊN CỨU
 
 - `MUSEUM_MAIL_USERNAME`: địa chỉ Gmail dùng để gửi email.
 - `MUSEUM_MAIL_PASSWORD`: mật khẩu ứng dụng Gmail.
-- `MUSEUM_MAIL_ADMIN`: địa chỉ nhận thông báo đăng ký.
+- `MUSEUM_MAIL_ADMIN` (tuỳ chọn): địa chỉ nhận thông báo đăng ký. Mặc định là
+  `nguyenthanhthinh078@gmail.com`; có thể đặt biến này để dùng địa chỉ khác.
 
 Ví dụ thêm vào cấu hình Apache (thay các giá trị mẫu, không đưa mật khẩu thật lên GitHub):
 
 ```apache
 SetEnv MUSEUM_MAIL_USERNAME "your-email@gmail.com"
 SetEnv MUSEUM_MAIL_PASSWORD "your-app-password"
-SetEnv MUSEUM_MAIL_ADMIN "admin-email@example.com"
+SetEnv MUSEUM_MAIL_ADMIN "nguyenthanhthinh078@gmail.com"
 ```
 
 Không lưu mật khẩu email trong mã nguồn hoặc GitHub. Nếu chưa cấu hình SMTP,
